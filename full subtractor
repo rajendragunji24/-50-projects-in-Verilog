@@ -1,0 +1,50 @@
+RTL code
+module fullsubtractor(
+  input a,
+  input b,
+  input c,
+  output d,
+  output b0
+);
+  assign d = a ^ b ^ c;
+  assign b0 = (~a & b) | (b & c) | (~a & c);
+endmodule
+   TEST BENCH
+`timescale 1ns / 1ps
+module fstb_v;
+	// Inputs
+	reg a;
+	reg b;
+	reg c;
+// Outputs
+	wire d;
+	wire b0;
+	// Instantiate the Unit Under Test (UUT)
+	fullsubtractor uut (
+		.a(a), 
+		.b(b), 
+		.c(c), 
+		.d(d), 
+		.b0(b0)
+	);
+	initial begin
+		// Initialize Inputs
+		a = 0; b = 0; c = 0;#10;
+		a = 0; b = 0; c = 1;#10;
+		a = 0; b = 1; c = 0;#10;
+		a = 0; b = 1; c = 1;#10;
+		a = 1; b = 0; c = 0;#10;
+		a = 1; b = 0; c = 1;#10;
+		a = 1; b = 1; c = 0;#10;
+		a = 1; b = 1; c = 1;#10;
+
+		// Wait 100 ns for global reset to finish
+		#100;	$finish;
+        
+		// Add stimulus here
+
+	end
+      
+endmodule
+
+   
