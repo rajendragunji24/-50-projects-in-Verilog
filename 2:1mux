@@ -1,0 +1,53 @@
+RTL Code
+module mux(y, I1, I2, sel);
+    input I1;
+    input I2;
+    input sel;
+    output reg y;  // output should be reg because it is assigned in always block
+
+    always @(*) begin
+        if (sel)
+            y = I2;
+        else
+            y = I1;
+    end
+endmodule
+
+ test bench
+`timescale 1ns / 1ps
+module muxtb_v;
+	// Inputs
+	reg I1;
+	reg I2;
+	reg sel;
+	// Outputs
+	wire y;
+	// Instantiate the Unit Under Test (UUT)
+	mux uut (
+		.y(y), 
+		.I1(I1), 
+		.I2(I2), 
+		.sel(sel)
+	);
+	initial begin
+		// Initialize Inputs
+		I1 = 0; I2 = 0; sel = 0;#10;
+		I1 = 0; I2 = 1; sel = 0;#10;
+		I1 = 1; I2 = 0; sel = 0;#10;
+		I1 = 1; I2 = 1; sel = 0;#10;
+
+      I1 = 0; I2 = 0; sel = 1;#10;
+      I1 = 0; I2 = 1; sel = 1;#10;
+      I1 = 1; I2 = 0; sel = 1;#10;
+      I1 = 1; I2 = 1; sel = 1;#10;
+
+		// Wait 100 ns for global reset to finish
+		#100;	$finish;
+        
+		// Add stimulus here
+
+	end
+      
+endmodule
+
+ 
