@@ -1,0 +1,83 @@
+RTL CODE
+`timescale 1ns / 1ps
+module demux(
+   input in,
+   input [1:0] sel,  // Changed from single bit to 2-bit for 4 outputs
+   input en,         // Added enable signal which was used but not declared
+   output reg y1,y2,y3,y4
+);
+always @(*) begin
+   if(en) begin
+      case(sel)
+         2'b00: begin
+            y1 = in;
+            y2 = 0;
+            y3 = 0;
+            y4 = 0;
+         end
+         2'b01: begin
+            y1 = 0;
+            y2 = in;
+            y3 = 0;
+            y4 = 0;
+         end
+         2'b10: begin
+            y1 = 0;
+            y2 = 0;
+            y3 = in;
+            y4 = 0;
+         end
+         2'b11: begin
+            y1 = 0;
+            y2 = 0;
+            y3 = 0;
+            y4 = in;
+         end
+      endcase 
+   end else begin
+      y1 = 0;
+      y2 = 0;
+      y3 = 0;
+      y4 = 0;
+   end
+end
+endmodule
+
+  test bench
+`timescale 1ns / 1ps
+module demuxtb_v;
+	// Inputs
+	reg in;
+	reg [1:0] sel;
+	reg en;
+	// Outputs
+	wire y1;
+	wire y2;
+	wire y3;
+	wire y4;
+	// Instantiate the Unit Under Test (UUT)
+	demux uut (
+		.in(in), 
+		.sel(sel), 
+		.en(en), 
+		.y1(y1), 
+		.y2(y2), 
+		.y3(y3), 
+		.y4(y4)
+	);
+	initial begin
+		// Initialize Inputs
+		in = 0; sel = 0; en = 0;
+		in = 1; sel = 2'b00; en = 1;#10;
+		in = 1; sel = 2'b01; en = 1;#10;
+		in = 1; sel = 2'b10; en = 0;#10;
+		in = 1; sel = 2'b11; en = 1;#10;
+	// Wait 100 ns for global reset to finish
+		#100;	$finish;
+        	// Add stimulus here
+	end
+      
+endmodule
+
+
+  
