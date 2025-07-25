@@ -1,0 +1,61 @@
+RTL CODE
+`timescale 1ns / 1ps
+module demux(
+    input in,
+    input en,
+    input sel,
+    output reg y1,
+    output reg y2
+);
+
+always @(*) begin
+    if (en) begin
+        case (sel)
+            1'b0: begin
+                y1 = in;
+                y2 = 0;
+            end
+            1'b1: begin
+                y1 = 0;
+                y2 = in;
+            end
+        endcase
+    end else begin
+        y1 = 0;
+        y2 = 0;
+    end
+end
+
+endmodule
+
+     TEST Bench
+  `timescale 1ns / 1ps
+module demuxtb_v;
+	// Inputs
+	reg in;
+	reg en;
+	reg sel;
+	// Outputs
+	wire y1;
+	wire y2;
+	// Instantiate the Unit Under Test (UUT)
+	demux uut (
+		.in(in), 
+		.en(en), 
+		.sel(sel), 
+		.y1(y1), 
+		.y2(y2)
+	);
+	initial begin
+		// Initialize Inputs
+		in = 0; en = 0; sel = 0;#10;
+		in = 1; en = 0; sel = 1;#10;
+		in = 0; en = 1; sel = 0;#10;
+		in = 1; en = 1; sel = 1;#10;
+		// Wait 100 ns for global reset to finish
+		#100;$finish;
+  		// Add stimulus here
+	end
+      
+endmodule
+
