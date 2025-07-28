@@ -1,0 +1,63 @@
+RTL CODE
+`timescale 1ns / 1ps
+module comparator (
+    input [3:0] A,
+    input [3:0] B,
+    output A_gt_B,
+    output A_eq_B,
+    output A_lt_B
+);
+
+assign A_gt_B = (A > B);
+assign A_eq_B = (A == B);
+assign A_lt_B = (A < B);
+
+endmodule
+
+   TEST BENCH
+`timescale 1ns / 1ps
+module comparatortb_v;
+	// Inputs
+	reg [3:0] A;
+	reg [3:0] B;
+	// Outputs
+	wire A_gt_B;
+	wire A_eq_B;
+	wire A_lt_B;
+	// Instantiate the Unit Under Test (UUT)
+	comparator uut (
+		.A(A), 
+		.B(B), 
+		.A_gt_B(A_gt_B), 
+		.A_eq_B(A_eq_B), 
+		.A_lt_B(A_lt_B)
+	);
+	initial begin
+		// Initialize Inputs
+		A = 4'b0000; B = 4'b0000;#10;
+		A = 4'b0001; B = 4'b0000;#10;
+		A = 4'b0000; B = 4'b0001;#10;
+		A = 4'b1111; B = 4'b1111;#10;
+		A = 4'b1111; B = 4'b1110;#10;
+		A = 4'b1110; B = 4'b1111;#10;
+		A = 4'b1010; B = 4'b0101;#10;
+		A = 4'b0101; B = 4'b1010;#10;
+		A = 4'b0110; B = 4'b0110;#10;
+		A = 4'b1000; B = 4'b0111;#10;
+		A = 4'b0111; B = 4'b1000;#10;
+		A = 4'b1111; B = 4'b0000;#10;
+		A = 4'b0000; B = 4'b1111;#10;
+		A = 4'b1010; B = 4'b0101;#10;
+		A = 4'b0101; B = 4'b1010;#10;
+
+
+		// Wait 100 ns for global reset to finish
+		#100;$finish;
+        
+		// Add stimulus here
+
+	end
+      
+endmodule
+
+   
