@@ -1,0 +1,64 @@
+RTL CODE
+module bcd_encoder (
+    input  [9:0] din,
+    output reg [3:0] dout
+);
+
+always @(*) begin
+    case (din)
+        10'b0000000001: dout = 4'b0000; // 0
+        10'b0000000010: dout = 4'b0001; // 1
+        10'b0000000100: dout = 4'b0010; // 2
+        10'b0000001000: dout = 4'b0011; // 3
+        10'b0000010000: dout = 4'b0100; // 4
+        10'b0000100000: dout = 4'b0101; // 5
+        10'b0001000000: dout = 4'b0110; // 6
+        10'b0010000000: dout = 4'b0111; // 7
+        10'b0100000000: dout = 4'b1000; // 8
+        10'b1000000000: dout = 4'b1001; // 9
+        default: dout = 4'bxxxx;        // Invalid input
+    endcase
+end
+
+endmodule
+
+    test bench
+`timescale 1ns / 1ps
+
+module bcd_encoder_tb;
+
+    reg [9:0] din;
+    wire [3:0] dout;
+
+    // Instantiate the DUT (Device Under Test)
+    bcd_encoder uut (
+        .din(din),
+        .dout(dout)
+    );
+
+    initial begin
+        $display("Time\t\t din\t\t\t dout");
+        $monitor("%0t\t %b\t %b", $time, din, dout);
+
+        // Valid BCD inputs
+        din = 10'b0000000001; #10;
+        din = 10'b0000000010; #10;
+        din = 10'b0000000100; #10;
+        din = 10'b0000001000; #10;
+        din = 10'b0000010000; #10;
+        din = 10'b0000100000; #10;
+        din = 10'b0001000000; #10;
+        din = 10'b0010000000; #10;
+        din = 10'b0100000000; #10;
+        din = 10'b1000000000; #10;
+
+        // Invalid test cases for default condition
+        din = 10'b0000000000; #10; // No bit active
+        din = 10'b0000000011; #10; // Multiple bits active
+        din = 10'b1111111111; #10; // All bits active
+
+        #100;
+        $finish;
+    end
+
+endmodule
