@@ -1,0 +1,32 @@
+RTL CODE
+`timescale 1ns / 1ps
+module odd_parity_generator(
+   input[3:0]data_in,
+   output parity
+    );
+    assign parity = ~(data_in[3] ^ data_in[2] ^ data_in[1] ^ data_in[0]);
+endmodule
+
+TEST BENCH
+`timescale 1ns / 1ps
+module odd_parity_generator_tb;
+    reg[3:0]data_in;
+    wire parity;
+    
+    odd_parity_generator uut(
+    .data_in(data_in),
+    .parity(parity)
+    );
+    initial begin 
+    $monitor("Time = %0t | data_in = %b | parity = %b", $time, data_in, parity);
+        
+        data_in = 4'b0000; #10;
+        data_in = 4'b0001; #10;
+        data_in = 4'b0011; #10;
+        data_in = 4'b0111; #10;
+        data_in = 4'b1111; #10;
+        data_in = 4'b1010; #10;
+
+        $finish;
+    end
+     endmodule
