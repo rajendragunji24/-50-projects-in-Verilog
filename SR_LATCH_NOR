@@ -1,0 +1,50 @@
+RTL CODE
+`timescale 1ns / 1ps
+
+module SR_latch_nor(
+    input wire S,
+    input wire R,
+    output reg Q,
+    output reg Qn
+     );
+     always @(*)begin
+         if(S == 0 && R == 0)begin
+          Q = Q;
+          Qn = Qn;
+         end
+        else if(S == 0 && R == 1)begin
+          Q = 0;
+          Qn = 1;
+        end
+        else if(S == 1 && R == 0)begin
+          Q = 1;
+          Qn = 0;
+         end
+        else if(S == 1 && R == 1)begin
+          Q = 1'bx;
+          Qn = 1'bx;
+      end
+   end       
+endmodule
+
+   test bench
+`timescale 1ns / 1ps
+module SR_latch_nor_tb;
+    reg S,R;
+    wire Q,Qn;
+    SR_latch_nor uut(
+      .S(S),
+      .R(R),
+      .Q(Q),
+      .Qn(Qn)
+      );
+      initial 
+         begin
+         $monitor("Time=%0t | S=%b R=%b | Q=%b Qn=%b",$time, S, R, Q, Qn);
+         S = 0; R = 0;#10;
+         S = 0; R = 1;#10;
+         S = 1; R = 0;#10;
+         S = 1; R = 1;#10;
+      $finish;
+    end
+endmodule   
