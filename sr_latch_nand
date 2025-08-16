@@ -1,0 +1,52 @@
+RTL CODE
+`timescale 1ns / 1ps
+module sr_latch_nand(
+   input  s,
+   input  r,
+   output reg q,
+   output reg qbar
+
+    );
+    always @(*) begin
+     case({s,r})
+       2'b00: begin
+          q = 1'bx;
+          qbar = 1'bx;
+       end
+       2'b01: begin
+         q = 1'b1;
+         qbar = 1'b0;
+       end
+       2'b10: begin
+         q = 1'b0;
+         qbar = 1'b1;
+       end
+       2'b11: begin
+         q = q;
+         q = qbar;
+       end
+     endcase  
+  end
+endmodule
+
+   test bench
+   `timescale 1ns / 1ps
+module sr_latch_nand_tb;
+    reg s,r;
+    wire q,qbar;
+   sr_latch_nand uut(
+     .s(s),
+     .r(r),
+     .q(q),
+     .qbar(qbar)
+    );
+    initial 
+      begin
+      $monitor("Time=%0t | s=%b r=%b | q=%b qbar=%b", $time, s, r, q, qbar);
+      s = 0; r = 0;#10;
+      s = 0; r = 1;#10;
+      s = 1; r = 0;#10;
+      s = 1; r = 1;#10;
+    $finish;
+  end
+endmodule
