@@ -1,0 +1,63 @@
+RTL CODE
+`timescale 1ns / 1ps
+
+// SR Flip-Flop (Positive Edge Triggered)
+module sr_ff (
+    input wire clk,     // clock
+    input wire rst,     // asynchronous reset
+    input wire s,       // set input
+    input wire r,       // reset input
+    output reg q     // output
+);
+
+ 
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            q <= 1'b0;         // reset output
+        end
+        else begin
+            case ({s, r})
+                2'b00: q <= q;    // hold state
+                2'b01: q <= 1'b0; // reset
+                2'b10: q <= 1'b1; // set
+                2'b11: q <= 1'bx; // invalid condition
+            endcase
+        end
+    end
+
+endmodule
+
+   test bench
+`timescale 1ns/1ps
+module sr_ff_tb;
+  reg clk, rst, s, r;
+  wire q;
+  sr_ff uut (
+    .clk(clk),
+    .rst(rst),
+    .s(s),
+    .r(r),
+    .q(q)
+  );
+  initial begin
+    clk = 0;
+    forever #5 clk = ~clk;  // 10ns period
+  end
+  initial begin
+    // Start with reset
+    rst = 1; s = 0; r = 0;
+    #10 rst = 0;   // release reset
+    s = 0; r = 0; #10;  // Hold
+    s = 0; r = 1; #10;  // Reset
+    s = 1; r = 0; #10;  // Set
+    s = 1; r = 1; #10;  // Invalid
+    s = 0; r = 0; #10;  // Hold again
+    $finish;
+  end
+  initial begin
+    $monitor("Time=%0t | clk=%b rst=%b s=%b r=%b | q=%b",
+             $time, clk, rst, s, r, q);
+  end
+endmodule
+   
