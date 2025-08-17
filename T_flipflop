@@ -1,0 +1,51 @@
+RTL CODE
+`timescale 1ns / 1ps
+module T_ff(
+  input clk,rst,t,
+  output reg q
+
+    );
+    always @(posedge clk or negedge rst) begin
+      if(!rst) begin
+       q <= 1'b0;
+      end
+      else if(t)
+       q <= ~q;
+      else
+       q <= q;
+     end
+      
+endmodule
+
+ test bench
+`timescale 1ns / 1ps
+module T_ff_tb;
+   reg clk,rst,t;
+   wire q;
+   
+   T_ff uut(
+     .clk(clk),
+     .rst(rst),
+     .t(t),
+     .q(q)
+    );
+    
+    initial begin
+    clk=0;
+    forever #5 clk=~clk;
+    end
+    
+    initial begin
+       rst=1; t=0;
+      #10 rst=1;
+     end
+     
+     initial begin
+       $monitor("Time=%0t | clk=%b rst=%b t=%b | q=%b", $time, clk, rst, t, q);
+       t=0;#10;
+       t=1;#40;
+       t=1;#20;
+       t=0;#40;
+      $finish;
+    end
+ endmodule
