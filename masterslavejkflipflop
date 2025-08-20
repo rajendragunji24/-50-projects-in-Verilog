@@ -1,0 +1,60 @@
+RTL CODE
+`timescale 1ns / 1ps
+module masterslave(
+   input j,k,clk,
+   output reg q_s,q_sbar
+    );
+      reg q_m,q_mbar;
+      //master
+      always@(posedge clk) begin
+       if(j==0 && k==0)begin
+          q_m=0;
+          q_mbar=0;
+       end
+       else if(j==0 && k==1)begin
+         q_m<=0;
+         q_mbar<=1;
+       end
+       else if(j==1 && k==1)begin
+        q_m<=1;
+        q_mbar<=0;
+      end
+       else begin
+        q_m<=q_m;
+        q_mbar<=~q_mbar;
+      end
+    end
+    //slave
+    always@(negedge clk)begin
+      q_s<=q_m;
+      q_sbar<=~q_mbar;
+    end
+endmodule
+
+test bench
+`timescale 1ns / 1ps
+module masterslave_tb;
+   reg j,k,clk;
+   wire q_s,q_sbar;
+  
+  masterslave uut(
+    .j(j),
+    .k(k),
+    .clk(clk),
+    .q_s(q_s),
+    .q_sbar(q_sbar)
+    );
+    initial begin
+      clk=0;
+      forever #10 clk=~clk;
+    end
+    
+    initial begin
+      j=1; k=0; #10;
+      j=0; k=1; #10; 
+      j=0; k=1; #10; 
+      j=1; k=1; #10; 
+      j=1; k=1; #10;
+   $finish;
+  end   
+endmodule
