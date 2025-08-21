@@ -1,0 +1,56 @@
+RTL CODE 
+`timescale 1ns / 1ps
+module masterslave_dff(
+   input clk,rst,d,
+   output reg qm,qs
+);
+
+   //master
+   always @(posedge clk or posedge rst)begin
+     if(rst)
+       qm<=1'b0;
+     else
+       qm<=d;
+    end
+    //slave
+    always @(negedge clk or posedge rst)begin
+      if(rst)
+        qs<=1'b0;
+      else
+        qs<=qm;
+    end
+endmodule
+
+test bench
+`timescale 1ns / 1ps
+module masterslave_dff_tb;
+    reg clk,rst,d;
+    wire qm,qs;
+
+  masterslave_dff uut(
+     .clk(clk),
+     .rst(rst),
+     .d(d),
+     .qm(qm),
+     .qs(qs)
+     );
+     
+  initial begin
+  clk=0;
+  forever #10 clk=~clk;   
+ end
+ 
+ initial begin
+  rst=1; d=0;
+  #15; rst=0;
+  end
+  
+  initial begin
+    $monitor("Time=%0t | clk=%b rst=%b d=%b | qm=%b qs=%b", $time, clk, rst, d, qm, qs);
+     d = 0;#10;
+     d = 1;#10;
+     d = 0;#20;
+     d = 1;#20;
+    $finish;
+  end
+endmodule
