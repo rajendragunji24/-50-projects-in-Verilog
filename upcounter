@@ -1,0 +1,76 @@
+RTL CODE
+module upcounter (
+    input clk,
+    input rst,
+    input load,
+    input [3:0] din,
+    output reg [3:0] count
+);
+    always @(posedge clk or posedge rst) begin
+        if (rst)
+            count <= 4'd0;         // Reset counter
+        else if (load)
+            count <= din;          // Load input value
+        else
+            count <= count + 1;    // Normal counting
+    end
+endmodule
+
+test bench
+`timescale 1ns / 1ps
+
+module upcounter_tb;
+    reg clk, rst, load;       // Control signals
+    reg [3:0] din;            // 4-bit input for loading data
+    wire [3:0] count;         // 4-bit counter output
+
+    // Instantiate the upcounter module
+    upcounter uut (
+        .clk(clk),
+        .rst(rst),
+        .load(load),
+        .din(din),
+        .count(count)
+    );
+
+    // Clock generation: 10ns period
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    // Initial reset
+    initial begin
+        rst = 1; 
+        load = 0;
+        din = 4'd0;
+        #10 rst = 0;   // Release reset after 10ns
+    end
+
+    // Test sequence
+    initial begin
+        $monitor("Time=%0t | clk=%b | rst=%b | load=%b | din=%d | count=%d",
+                  $time, clk, rst, load, din, count);
+
+        // Case 1: Load value 3 into counter
+        #10 load = 1; din = 4'd3;
+        #10 load = 0;
+
+        // Case 2: Load value 4 into counter
+        #10 load = 1; din = 4'd4;
+        #10 load = 0;
+
+        // Case 3: Normal counting without load
+        #30;
+
+        // Case 4: Load value 2 and count up
+        #10 load = 1; din = 4'd2;
+        #10 load = 0;
+
+        // Wait for some counts
+        #50;
+
+        // Finish simulation
+        $finish;
+    end
+endmodule
