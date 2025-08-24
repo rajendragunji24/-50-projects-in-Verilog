@@ -1,0 +1,97 @@
+RTL CODE
+`timescale 1ns / 1ps
+module up_downcounter (
+    input clk,
+    input rst,
+    input load,
+    input up_down,
+    input [3:0] din,
+    output reg [3:0] count
+);
+    always @(posedge clk or posedge rst) begin
+        if (rst)
+            count <= 4'd0;         // Reset counter
+        else if (load)
+            count <= din;          // Load input value
+        else if(up_down)
+            count <= count + 1;    // Normal counting
+        else
+            count <= count - 1;
+     end
+endmodule
+
+test bench
+`timescale 1ns / 1ps
+module up_downcountertb;
+    reg clk,rst,load,up_down;
+    reg [3:0] din;
+    wire [3:0] count;
+
+    // Instantiate DUT
+    up_downcounter uut (
+        .clk(clk),
+        .rst(rst),
+        .load(load),
+        .up_down(up_down),
+        .din(din),
+        .count(count)
+    );
+
+    // Clock generation: 10ns period
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    // Initial reset
+    initial begin
+        rst = 1; 
+        load = 0; 
+        din = 4'd0;
+        up_down = 1;
+        #10;
+        rst = 0;
+    end
+
+    // Applying inputs using for loop
+    initial begin
+       $monitor("Time=%0t | clk=%b | rst=%b | load=%b | up_down=%b | din=%d | count=%d",
+          $time, clk, rst, load, up_down, din, count);
+        up_down = 1;
+       load=1; din=4'd0;#10; 
+       load=1; din=4'd1;#10;
+       load=1; din=4'd2;#10; 
+       load=1; din=4'd3;#10; 
+       load=1; din=4'd4;#10; 
+       load=1; din=4'd5;#10; 
+       load=1; din=4'd6;#10; 
+       load=1; din=4'd7;#10; 
+       load=1; din=4'd8;#10; 
+       load=1; din=4'd9;#10; 
+       load=1; din=4'd10;#10; 
+       load=1; din=4'd11;#10; 
+       load=1; din=4'd12;#10; 
+       load=1; din=4'd13;#10; 
+       load=1; din=4'd14;#10;  
+       load=1; din=4'd15;#10;
+     up_down = 0;
+  //downcounting
+       load=1; din=4'd15;#10; 
+       load=1; din=4'd14;#10;
+       load=1; din=4'd13;#10; 
+       load=1; din=4'd12;#10; 
+       load=1; din=4'd11;#10; 
+       load=1; din=4'd10;#10; 
+       load=1; din=4'd9;#10; 
+       load=1; din=4'd8;#10; 
+       load=1; din=4'd7;#10; 
+       load=1; din=4'd6;#10; 
+       load=1; din=4'd5;#10; 
+       load=1; din=4'd4;#10; 
+       load=1; din=4'd3;#10; 
+       load=1; din=4'd2;#10; 
+       load=1; din=4'd1;#10;  
+       load=1; din=4'd0;#10;
+        $finish;
+    end
+endmodule
