@@ -1,0 +1,72 @@
+RTL CODE
+`timescale 1ns / 1ps
+module async_up_counter(
+    input clk,             // Main clock input
+    input rst,             // Active-high reset
+    input load,            // Load enable
+    input [3:0] din,       // Data input for loading
+    output [3:0] q         // 4-bit counter output
+);
+    T_ff tff0 (.clk(clk),   .rst(rst), .load(load), .din(din[0]), .q(q[0]));
+    T_ff tff1 (.clk(q[0]),  .rst(rst), .load(load), .din(din[1]), .q(q[1]));
+    T_ff tff2 (.clk(q[1]),  .rst(rst), .load(load), .din(din[2]), .q(q[2]));
+    T_ff tff3 (.clk(q[2]),  .rst(rst), .load(load), .din(din[3]), .q(q[3]));
+endmodule
+module T_ff(
+    input clk,
+    input rst,
+    input load,
+    input din,
+    output reg q
+);
+    always @(posedge clk or posedge rst) begin
+        if (rst)
+            q <= 1'b0;            // Reset counter
+        else if (load)
+            q <= din;             // Load given data bit
+        else
+            q <= ~q;              // Toggle normally
+    end
+endmodule
+
+test bench
+`timescale 1ns / 1ps
+module async_up_counter_tb;
+    reg clk, rst,load;
+    reg [3:0]din;
+    wire [3:0] q;
+    async_up_counter uut (
+        .clk(clk),
+        .rst(rst),
+        .load(load),
+        .din(din),
+        .q(q)
+    );
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;  // Toggle clock every 5ns
+    end
+
+    initial begin
+        // Display counter values
+        $monitor("Time=%0t | clk=%b | rst=%b | q=%d | load=%b | din=%d",
+                 $time, clk, rst, load, din, q);
+       load=1; din=4'd0;#10; 
+       load=1; din=4'd1;#10;
+       load=1; din=4'd2;#10; 
+       load=1; din=4'd3;#10; 
+       load=1; din=4'd4;#10; 
+       load=1; din=4'd5;#10; 
+       load=1; din=4'd6;#10; 
+       load=1; din=4'd7;#10; 
+       load=1; din=4'd8;#10; 
+       load=1; din=4'd9;#10; 
+       load=1; din=4'd10;#10; 
+       load=1; din=4'd11;#10; 
+       load=1; din=4'd12;#10; 
+       load=1; din=4'd13;#10; 
+       load=1; din=4'd14;#10;  
+       load=1; din=4'd15;#10;
+    $finish;
+  end
+endmodule
