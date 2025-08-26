@@ -1,0 +1,53 @@
+RTL CODE
+`timescale 1ns / 1ps
+module siso(
+  input clk,rst,shift_in,
+  output reg shift_out
+ );
+ reg [3:0]data;
+ always @(posedge clk)begin
+   if(rst)begin
+     data <= 4'b0000;
+     shift_out <= 1'b0;
+    end
+   else begin
+    data[0] <= shift_in;
+    data[1] <= data[0];
+    data[2] <= data[1];
+    data[3] <= data[2];
+    shift_out <= data[3];
+  end
+ end
+endmodule
+
+test bench
+`timescale 1ns / 1ps
+module sisotb;
+  reg clk,rst,shift_in;
+  wire shift_out;
+   siso uut(
+    .clk(clk),
+    .rst(rst),
+    .shift_in(shift_in),
+    .shift_out(shift_out)
+    );
+    
+    initial begin
+      clk=0;
+      forever #5 clk=~clk;
+    end
+    
+    initial begin
+     rst=1; shift_in=0;
+     #10; rst=0;
+    end
+    
+    initial begin
+      $monitor("Time=%0t | clk=%b | rst=%b | shift_in=%b | shift_out=%b", $time, clk, rst, shift_in, shift_out);
+      shift_in = 1;#10;
+      shift_in = 0;#10;
+      shift_in = 1;#10;
+      shift_in = 1;#10;
+  #100; $finish;
+  end
+  endmodule
