@@ -1,0 +1,47 @@
+RTL CODE
+`timescale 1ns / 1ps
+module sipo(
+  input clk,rst,si,
+  output reg[3:0]q
+    );
+    always @(posedge clk)begin
+       if(rst)
+         q<=4'b0000;
+       else
+         q<={q[2:0],si};
+     end
+      
+endmodule
+
+test bench
+`timescale 1ns / 1ps
+module sipotb;
+    reg clk, rst, si;
+    wire [3:0] q;
+    sipo uut (
+        .clk(clk),
+        .rst(rst),
+        .si(si),
+        .q(q)
+    );
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;  // 10ns clock period
+    end
+
+    initial begin
+        // Initialize
+        rst = 1; si = 0;
+        #10; rst = 0;
+       end
+
+      initial begin
+        $monitor("Time=%0t | clk=%b | rst=%b | si=%b | q=%b", $time, clk, rst, si, q);    
+        si = 1; #10;  // First bit
+        si = 0; #10;  // Second bit
+        si = 1; #10;  // Third bit
+        si = 1; #10;  // Fourth bit
+
+      $finish;
+    end
+endmodule
