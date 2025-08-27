@@ -1,0 +1,59 @@
+RTL CODE
+`timescale 1ns / 1ps
+module piso(
+  input clk,rst,mode,
+  input[3:0]d,
+  output reg so
+ );
+  reg[3:0]q;
+ always @(posedge clk)begin
+   if(rst) begin
+     q<=4'b0000;
+     so<=1'b0;
+    end
+  else begin
+    case(mode)
+      1'b1: begin
+        q<=d;
+      end
+      1'b0: begin
+        so<=q[0];
+        q<=q>>1;
+      end
+    endcase
+  end
+ end
+ endmodule
+
+test bench
+`timescale 1ns / 1ps
+module pisotb;
+  reg clk,rst,mode;
+  reg [3:0]d;
+  wire so;
+piso uut(
+  .clk(clk),
+  .rst(rst),
+  .mode(mode),
+  .d(d),
+  .so(so) );
+  
+  initial begin
+    clk=0;
+    forever #5 clk=~clk;
+   end
+     
+     initial begin
+     rst=1; 
+     #10; rst=0;
+     end
+     
+     initial begin
+     $monitor("Time=%0t | clk=%b | rst=%b | mode=%b | d=%b | so=%b", $time, clk, rst, mode, d, so);
+    mode=1; d=4'b1001;
+    #10;
+    mode=0;
+    #100;
+    $finish;
+  end
+  endmodule
