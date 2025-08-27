@@ -1,0 +1,55 @@
+RTL CODE
+`timescale 1ns / 1ps
+module pipo(
+  input clk,rst,
+  input [3:0] pi,
+  output reg [3:0] po
+    );
+    always @(posedge clk) begin
+      if(rst)begin
+        po<=4'b0000;
+        end
+      else begin
+       po<=pi;
+    end
+ end
+endmodule
+
+test bench
+`timescale 1ns / 1ps
+module pipo_tb;
+
+    reg clk, rst;
+    reg [3:0] pi;
+    wire [3:0] po;
+
+    // Instantiate DUT
+    pipo uut (
+        .clk(clk),
+        .rst(rst),
+        .pi(pi),
+        .po(po)
+    );
+
+    // Clock generation
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    initial begin
+        $monitor("Time=%0t | clk=%b | rst=%b | pi=%b | po=%b",
+                  $time, clk, rst, pi, po);
+
+        // Apply reset
+        rst = 1; pi = 4'b0000;
+        #10 rst = 0;
+
+        // Apply inputs
+        pi = 4'b1010; #10;
+        pi = 4'b1100; #10;
+        pi = 4'b0111; #10;
+
+        $finish;
+    end
+endmodule
