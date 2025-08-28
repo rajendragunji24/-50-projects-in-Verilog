@@ -1,0 +1,94 @@
+RTL CODE
+`timescale 1ns / 1ps
+module seq_1011_mealy(
+    input clk, rst, x,
+    output reg z
+);
+  // State encoding
+    parameter s0 = 2'b00;  // No bits detected
+    parameter s1 = 2'b01;  // Detected "1"
+    parameter s2 = 2'b10;  // Detected "10"
+    parameter s3 = 2'b11;  // Detected "101"
+
+  reg [1:0] cst, nst;
+
+    // Sequential block: state update
+    always @(posedge clk) begin
+        if (rst)
+            cst <= s0;
+        else
+            cst <= nst;
+    end
+
+    // Combinational block: next-state & output logic
+    always @(*) begin
+        // Default values
+        nst = s0;
+        z = 0;
+
+        case (cst)
+            s0: begin
+                if (x)
+                    nst = s1;
+                else
+                    nst = s0;
+            end
+
+            s1: begin
+                if (x)
+                    nst = s1;      // Stay in s1 if another 1 comes
+                else
+                    nst = s2;      // Got "10"
+            end
+
+            s2: begin
+                if (x)
+                    nst = s3;      // Got "101"
+                else
+                    nst = s0;      // Got "100"
+            end
+
+            s3: begin
+                if (x) begin
+                    nst = s1;      // After detecting "1011", move to "1"
+                    z = 1;         // Output 1 when 1011 detected
+                end
+                else
+                    nst = s2;      // After "1010", go to state "10"
+            end
+        endcase
+    end
+endmodule
+
+test bench
+`timescale 1ns / 1ps
+module seq_1011_mealy_tb;
+   reg clk,rst,x;
+   wire z;
+seq_1011_mealy uut(
+   .clk(clk),
+   .rst(rst),
+   .x(x),
+   .z(z) );
+ initial begin
+    clk=0;
+    forever #5 clk=~clk;
+  end
+  initial begin
+    rst=1;
+    #10; rst=0;
+   end
+ initial begin
+   $monitor("Time=%0t | clk=%b | rst=%b } x=%b | z=%b", $time, clk, rst, x, z);
+  x=1; #10;
+  x=0; #10;
+  x=1; #10;
+  x=1; #10;
+  x=0; #10;
+  x=1; #10;
+  x=0; #10;
+  x=1; #10;
+$finish;
+end
+
+endmodule
